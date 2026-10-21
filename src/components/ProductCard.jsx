@@ -12,6 +12,8 @@ function ProductCard({ product, onAddToCart }) {
                     className="w-full h-48 object-contain hover:scale-105 transition-transform duration-300"
                     src={product.thumbnail}
                     alt={product.title}
+                    loading="lazy"
+                    decoding="async"
                 />
             </div>
 

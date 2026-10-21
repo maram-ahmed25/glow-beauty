@@ -1,11 +1,10 @@
-
 import { useState, useEffect } from "react";
 import ProductCard from "../components/ProductCard";
 
 function Products({ cart, setCart }) {
     const [products, setProducts] = useState([]);
+    const [loading, setLoading] = useState(true);
     const [showToast, setShowToast] = useState(false);
-
 
     useEffect(() => {
         if (showToast) {
@@ -17,10 +16,15 @@ function Products({ cart, setCart }) {
         }
     }, [showToast]);
 
-
     useEffect(() => {
         fetch("https://dummyjson.com/products")
-            .then((response) => response.json())
+            .then((response) => {
+                if (!response.ok) {
+                    throw new Error("Failed to fetch products");
+                }
+
+                return response.json();
+            })
             .then((data) => {
                 setProducts(
                     data.products
@@ -31,6 +35,12 @@ function Products({ cart, setCart }) {
                         )
                         .slice(0, 10)
                 );
+            })
+            .catch((error) => {
+                console.error("Error loading products:", error);
+            })
+            .finally(() => {
+                setLoading(false);
             });
     }, []);
 
@@ -48,43 +58,57 @@ function Products({ cart, setCart }) {
                     Discover your favorites and find your beauty essentials.
                 </p>
 
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-                    {products.map((product) => (
-                        <ProductCard
-                            key={product.id}
-                            product={product}
-                            onAddToCart={() => {
-                                setCart((currentCart) => {
-                                    const existingProduct =
-                                        currentCart.find(
-                                            (item) => item.id === product.id
-                                        );
+                {loading ? (
+                    <p className="text-center py-10 text-[#302A2B]">
+                        Loading products...
+                    </p>
+                ) : products.length === 0 ? (
+                    <p className="text-center py-10 text-[#302A2B]">
+                        Unable to load products. Please try again later.
+                    </p>
+                ) : (
+                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+                        {products.map((product) => (
+                            <ProductCard
+                                key={product.id}
+                                product={product}
+                                onAddToCart={() => {
+                                    setCart((currentCart) => {
+                                        const existingProduct =
+                                            currentCart.find(
+                                                (item) =>
+                                                    item.id === product.id
+                                            );
 
-                                    if (existingProduct) {
-                                        return currentCart.map((item) =>
-                                            item.id === product.id
-                                                ? {
-                                                    ...item,
-                                                    quantity:
-                                                        (item.quantity || 1) + 1,
-                                                }
-                                                : item
-                                        );
-                                    }
+                                        if (existingProduct) {
+                                            return currentCart.map((item) =>
+                                                item.id === product.id
+                                                    ? {
+                                                        ...item,
+                                                        quantity:
+                                                            (item.quantity ||
+                                                                1) + 1,
+                                                    }
+                                                    : item
+                                            );
+                                        }
 
-                                    return [
-                                        ...currentCart,
-                                        { ...product, quantity: 1 },
-                                    ];
-                                });
+                                        return [
+                                            ...currentCart,
+                                            {
+                                                ...product,
+                                                quantity: 1,
+                                            },
+                                        ];
+                                    });
 
-                                setShowToast(true);
-                            }}
-                        />
-                    ))}
-                </div>
+                                    setShowToast(true);
+                                }}
+                            />
+                        ))}
+                    </div>
+                )}
             </div>
-
 
             {showToast && (
                 <div className="fixed top-5 right-5 z-50 flex items-center gap-3 rounded-xl bg-white px-5 py-4 shadow-lg border border-green-100">
@@ -97,7 +121,6 @@ function Products({ cart, setCart }) {
                     </span>
                 </div>
             )}
-
         </section>
     );
 }

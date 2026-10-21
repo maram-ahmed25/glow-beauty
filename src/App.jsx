@@ -38,6 +38,10 @@ function App() {
     return savedCart ? JSON.parse(savedCart) : [];
   });
 
+  useEffect(() => {
+    localStorage.setItem("cart", JSON.stringify(cart));
+  }, [cart]);
+
   return (
     <BrowserRouter>
       <ScrollToProducts />
@@ -59,7 +63,7 @@ function App() {
         <Route path="/about" element={<About />} />
         <Route path="/contact" element={<Contact />} />
         <Route path="/Register" element={<Register />} />
-         <Route path="/Login" element={<Login />} />
+        <Route path="/Login" element={<Login />} />
       </Routes>
       <Footer />
     </BrowserRouter>
