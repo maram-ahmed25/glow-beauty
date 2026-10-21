@@ -9,6 +9,8 @@ import ProductDetails from "./pages/ProductDetails";
 import About from "./pages/About";
 import Contact from "./pages/Contact";
 import Footer from "./components/Footer";
+import Register from "./pages/Register";
+import Login from "./pages/Login";
 
 function ScrollToProducts() {
   const location = useLocation();
@@ -56,6 +58,8 @@ function App() {
         <Route path="/products/:id" element={<ProductDetails cart={cart} setCart={setCart} />} />
         <Route path="/about" element={<About />} />
         <Route path="/contact" element={<Contact />} />
+        <Route path="/Register" element={<Register />} />
+         <Route path="/Login" element={<Login />} />
       </Routes>
       <Footer />
     </BrowserRouter>
